@@ -154,4 +154,6 @@ return [
 
     ],
 
+    'username_login_pattern' => ''
+
 ];

@@ -78,6 +78,9 @@ class AdldapAuthUserProvider extends EloquentUserProvider
                 // Retrieve the password from the submitted credentials.
                 $password = Arr::get($credentials, $this->getPasswordKey());
 
+                // Edited by Minkbear: Change user into pattern you give
+                $username = $this->getUsernameLoginPattern($username);
+
                 // Try to log the user in.
                 if (!is_null($password) && $this->authenticate($username, $password)) {
                     // Login was successful, we'll create a new
@@ -156,5 +159,23 @@ class AdldapAuthUserProvider extends EloquentUserProvider
     protected function getLoginFallback()
     {
         return Config::get('adldap_auth.login_fallback', false);
+    }
+
+    /**
+     * Retrieves username pattern for converting user login name
+     * sample pattern: cn=#input_username#
+     * It will convert to cn=username
+     *
+     * @param $username username from input
+     * @return mixed
+     */
+    protected function getUsernameLoginPattern($username)
+    {
+        $txt = Config::get('adldap_auth.username_login_pattern');
+        if (empty($txt))
+            return $username;
+        $txt = str_replace("#input_username#", $username, $txt);
+        $txt = str_replace("#base_dn#", Config::get('adldap.connection_settings.base_dn'), $txt);
+        return $txt;
     }
 }
