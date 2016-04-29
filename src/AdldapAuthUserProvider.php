@@ -56,10 +56,18 @@ class AdldapAuthUserProvider extends EloquentUserProvider
             // Retrieve the first user result.
             $user = $query->first();
 
+            // Edited by Minkbear: In case of not found.
+            if (!$user) return null;
+
+            // Edited by Minkbear: Convert \Adldap\Models\Entry to \Adldap\Models\User
+            if ($user instanceof \Adldap\Models\Entry) {
+                $u = new User($user->getAttributes(), $query);
+            }
+
             // If the user is an Adldap User model instance.
             if ($user instanceof User) {
                 // Retrieve the users login attribute.
-                $username = $user->{$this->getLoginAttribute()};
+                $username = $u->{$this->getLoginAttribute()};
 
                 if (is_array($username)) {
                     // We'll make sure we retrieve the users first username
@@ -74,7 +82,7 @@ class AdldapAuthUserProvider extends EloquentUserProvider
                 if (!is_null($password) && $this->authenticate($username, $password)) {
                     // Login was successful, we'll create a new
                     // Laravel model with the Adldap user.
-                    return $this->getModelFromAdldap($user, $password);
+                    return $this->getModelFromAdldap($u, $password);
                 }
             }
         }
