@@ -79,10 +79,11 @@ class AdldapAuthUserProvider extends EloquentUserProvider
                 $password = Arr::get($credentials, $this->getPasswordKey());
 
                 // Edited by Minkbear: Change user into pattern you give
-                $username = $this->getUsernameLoginPattern($username);
+                // Obsolate this function
+                //$username = $this->getUsernameLoginPattern($username);
 
                 // Try to log the user in.
-                if (!is_null($password) && $this->authenticate($username, $password)) {
+                if (!is_null($password) && $this->authenticate($user->{'dn'}, $password)) {
                     // Login was successful, we'll create a new
                     // Laravel model with the Adldap user.
                     return $this->getModelFromAdldap($u, $password);
